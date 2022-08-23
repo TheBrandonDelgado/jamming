@@ -1,4 +1,4 @@
-const clientID = '786cd56cde3b46968b942bf4bbc7f644'
+const clientID = '' // removed for security
 const redirectURI = 'http://localhost:3000/'
 
 let accessToken
@@ -31,7 +31,7 @@ const Spotify = {
                 Authorization: `Bearer ${accessToken}`
             }
         }).then(response => {
-            response.json()
+            return response.json()
         }).then(jsonResponse => {
             if (!jsonResponse.tracks) {
                 return []
@@ -49,7 +49,7 @@ const Spotify = {
 
     savePlaylist(playlistName, trackURIs) {
         if (!playlistName || !trackURIs.length) {
-            return
+            return Promise.resolve()
         }
 
         const accessToken = Spotify.getAccessToken()
@@ -59,7 +59,7 @@ const Spotify = {
         let userID
         
         return fetch('https://api.spotify.com/v1/me', {headers: headers}
-        ).then(response => { response.json() }
+        ).then(response => { return response.json() }
         ).then(jsonResponse => {
             userID = jsonResponse.id
             return fetch(`https://api.spotify.com/v1/users/${userID}/playlists`, {
@@ -67,10 +67,10 @@ const Spotify = {
                 method: "POST",
                 body: JSON.stringify({name: playlistName})
             }).then(response => {
-                response.json()
+                return response.json()
             }).then(jsonResponse => {
                 const playlistID = jsonResponse.id
-                return fetch(`/v1/users/${userID}/playlists/${playlistID}/tracks`, {
+                return fetch(`https://api.spotify.com/v1/users/${userID}/playlists/${playlistID}/tracks`, {
                     headers: headers,
                     method: "POST",
                     body: JSON.stringify({ uris: trackURIs })
